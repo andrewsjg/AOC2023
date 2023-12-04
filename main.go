@@ -1,11 +1,24 @@
 package main
 
 import (
-	puzzle1 "github.com/andrewsjg/AOC2023/Puzzle1"
+	"fmt"
+
+	"github.com/andrewsjg/AOC2023/puzzle1"
+	"github.com/andrewsjg/AOC2023/puzzle2"
 )
 
 func main() {
-	// Puzzle 1
-	puzzle1.P1Solve("./Puzzle1/input.txt")
-	puzzle1.P2Solve("./Puzzle1/input.txt")
+
+	fmt.Println("======================================================")
+	fmt.Println("                     Puzzle 1")
+	fmt.Println("======================================================")
+	puzzle1.Part1Solve("./Puzzle1/input.txt")
+	puzzle1.Part2Solve("./Puzzle1/input.txt")
+
+	fmt.Println()
+	fmt.Println("======================================================")
+	fmt.Println("                     Puzzle 2")
+	fmt.Println("======================================================")
+	puzzle2.Part1Solve("./Puzzle2/input.txt")
+	puzzle2.Part2Solve("./Puzzle2/input.txt")
 }

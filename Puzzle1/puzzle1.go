@@ -10,7 +10,7 @@ import (
 	"unicode"
 )
 
-func P1Solve(input string) {
+func Part1Solve(input string) {
 
 	calibrationTotal := 0
 
@@ -58,7 +58,7 @@ func P1Solve(input string) {
 	fmt.Printf("The calibration total for puzzle 1, part 1 is: %d\n", calibrationTotal)
 }
 
-func P2Solve(input string) {
+func Part2Solve(input string) {
 	calibrationTotal := 0
 
 	validDigitStrings := []string{"one", "1", "two", "2", "three", "3", "four", "4", "five", "5", "six", "6", "seven", "7", "eight", "8", "nine", "9"}
