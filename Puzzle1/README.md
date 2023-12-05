@@ -1,4 +1,4 @@
-## Solution for [Puzzle 1](https://adventofcode.com/2023/day/1)
+# Solution for [Puzzle 1](https://adventofcode.com/2023/day/1)
 
 A little mind bender for the first puzzle. But if you are good at string wrangling you can figure out many ways to tackle and solve this one.
 
