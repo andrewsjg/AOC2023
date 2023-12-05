@@ -39,8 +39,6 @@ func Part1Solve(input string) {
 
 		line := scanner.Text()
 
-		fmt.Println(line)
-
 		sPartNum := ""
 		xParts := []part{}
 		foundPart := false
@@ -57,8 +55,16 @@ func Part1Solve(input string) {
 
 				sPartNum = strings.TrimSpace(sPartNum + string(r))
 				foundPart = true
+
+				// need to cater for the case where the part is at the end of the line
+				if x == len(line)-1 {
+					part := part{partNo: sPartNum, x: partX}
+					xParts = append(xParts, part)
+				}
+
 			} else {
 				if foundPart {
+
 					part := part{partNo: sPartNum, x: partX}
 					xParts = append(xParts, part)
 					sPartNum = ""
@@ -76,6 +82,7 @@ func Part1Solve(input string) {
 
 		parts[y] = xParts
 		markers[y] = xMarkers
+
 		y++
 	}
 
@@ -86,7 +93,6 @@ func Part1Solve(input string) {
 
 		for _, part := range partsList {
 			isValid := false
-			//fmt.Printf("PartNO: %s, PartX: %d\n", part.partNo, part.x)
 
 			partVal, err := strconv.Atoi(part.partNo)
 
@@ -99,8 +105,6 @@ func Part1Solve(input string) {
 			if !isValid {
 				for _, marker := range markers[y] {
 					if marker.x == part.x-1 || marker.x == part.x+len(part.partNo) {
-						fmt.Printf("Inline. Part: %s is a valid part. With Marker: %s\n", part.partNo, marker.marker)
-
 						isValid = true
 						partSum = partSum + partVal
 
@@ -113,8 +117,6 @@ func Part1Solve(input string) {
 				for _, marker := range markers[y-1] {
 
 					if marker.x >= part.x-1 && marker.x <= part.x+len(part.partNo) {
-
-						fmt.Printf("Above. Part: %s is a valid part. With Marker: %s\n", part.partNo, marker.marker)
 						isValid = true
 						partSum = partSum + partVal
 
@@ -127,8 +129,6 @@ func Part1Solve(input string) {
 				for _, marker := range markers[y+1] {
 
 					if marker.x >= part.x-1 && marker.x <= part.x+len(part.partNo) {
-
-						fmt.Printf("Below. Part: %s is a valid part. With Marker: %s\n", part.partNo, marker.marker)
 						isValid = true
 						partSum = partSum + partVal
 					}
@@ -138,10 +138,7 @@ func Part1Solve(input string) {
 		}
 
 	}
-	// 484101 to low
-	// 537049 to high
-	// 518219 to low
-	fmt.Println(markers)
+
 	fmt.Printf("The sum of all valid parts is: %d\n", partSum)
 
 }
