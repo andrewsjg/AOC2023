@@ -288,11 +288,6 @@ func Part2Solve(input string) {
 						gearTot = gearTot + (tmpTot * partVal)
 						tmpTot = 1
 						found1 = false
-
-						continue
-					} else {
-						tmpTot = tmpTot * partVal
-						found1 = true
 					}
 
 				}
