@@ -28,4 +28,6 @@ func main() {
 	fmt.Println("                     Puzzle 3")
 	fmt.Println("======================================================")
 	puzzle3.Part1Solve("./Puzzle3/input.txt")
+	puzzle3.Part2Solve("./Puzzle3/Input.txt")
+
 }
