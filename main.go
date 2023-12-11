@@ -7,6 +7,7 @@ import (
 	"github.com/andrewsjg/AOC2023/puzzle2"
 	"github.com/andrewsjg/AOC2023/puzzle3"
 	"github.com/andrewsjg/AOC2023/puzzle4"
+	"github.com/andrewsjg/AOC2023/puzzle5"
 )
 
 func main() {
@@ -37,5 +38,12 @@ func main() {
 	fmt.Println("======================================================")
 	puzzle4.Part1Solve("./Puzzle4/input.txt")
 	puzzle4.Part2Solve("./Puzzle4/input.txt")
+
+	fmt.Println()
+	fmt.Println("======================================================")
+	fmt.Println("                     Puzzle 5")
+	fmt.Println("======================================================")
+	puzzle5.Part1Solve("./Puzzle5/input.txt")
+	//puzzle5.Part2Solve("./Puzzle5/input.txt")
 
 }
