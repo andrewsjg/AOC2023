@@ -43,7 +43,7 @@ func main() {
 	fmt.Println("======================================================")
 	fmt.Println("                     Puzzle 5")
 	fmt.Println("======================================================")
-	puzzle5.Part1Solve("./Puzzle5/input.txt")
-	//puzzle5.Part2Solve("./Puzzle5/input.txt")
+	//puzzle5.Part1Solve("./Puzzle5/input.txt")
+	puzzle5.Part2Solve("./Puzzle5/input.txt")
 
 }

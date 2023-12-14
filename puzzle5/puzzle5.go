@@ -6,6 +6,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 )
 
 type rangeMap struct {
@@ -15,8 +16,97 @@ type rangeMap struct {
 	srcMax  int
 }
 
+func Part2Solve(input string) {
+
+	file, err := os.ReadFile(input)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	stringInput := string(file)
+
+	seeds := getSeeds(stringInput)
+
+	seedcount := 0
+
+	for idx := 0; idx < len(seeds); idx += 2 {
+
+		for seed := seeds[idx]; seed <= (seeds[idx] + seeds[idx+1]); seed++ {
+			seedcount++
+
+		}
+	}
+
+	allMaps := map[string][]rangeMap{}
+
+	tokens := []string{"seed-to-soil", "soil-to-fertilizer", "fertilizer-to-water", "water-to-light", "light-to-temperature", "temperature-to-humidity", "humidity-to-location"}
+
+	for _, token := range tokens {
+		allMaps[token] = getMap(stringInput, token)
+	}
+
+	lowestLocation := -1
+
+	locChannel := make(chan int, seedcount)
+
+	var wg sync.WaitGroup
+	for idx := 0; idx < len(seeds); idx += 2 {
+
+		for seed := seeds[idx]; seed <= (seeds[idx] + seeds[idx+1]); seed++ {
+			wg.Add(1)
+			go getLocation(seed, allMaps, locChannel, &wg)
+		}
+
+	}
+
+	wg.Wait()
+	close(locChannel)
+
+	for location := range locChannel {
+		if lowestLocation == -1 || location < lowestLocation {
+			lowestLocation = location
+		}
+
+	}
+
+	fmt.Printf("Lowest Location: %d\n", lowestLocation)
+}
+
+func getLocation(seed int, allMaps map[string][]rangeMap, ch chan int, wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	tokens := []string{"seed-to-soil", "soil-to-fertilizer", "fertilizer-to-water", "water-to-light", "light-to-temperature", "temperature-to-humidity", "humidity-to-location"}
+
+	myResult := seed
+
+	for _, token := range tokens {
+		myRange := allMaps[token]
+		myVal := myResult
+
+		for _, rnge := range myRange {
+
+			if myVal >= rnge.srcMin && myVal <= rnge.srcMax {
+				myResult = rnge.destMax - (rnge.srcMax - myVal)
+
+			}
+
+		}
+
+	}
+
+	ch <- myResult
+}
+
 func Part1Solve(input string) {
-	seeds := getSeeds(input)
+
+	file, err := os.ReadFile(input)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	stringInput := string(file)
+
+	seeds := getSeeds(stringInput)
 
 	seedToSoil := getMap(input, "seed-to-soil")
 	soilToFertilizer := getMap(input, "soil-to-fertilizer")
@@ -69,13 +159,7 @@ func getMapVal(rangeMap []rangeMap, myVal int) (myResult int) {
 
 func getSeeds(input string) (seeds []int) {
 
-	file, err := os.Open(input)
-	if err != nil {
-		fmt.Println(err)
-	}
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
+	scanner := bufio.NewScanner(strings.NewReader(input))
 
 	for scanner.Scan() {
 		line := strings.ToLower(scanner.Text())
@@ -115,13 +199,8 @@ func getMap(input string, token string) []rangeMap {
 	retMap := []rangeMap{}
 
 	tokenFound := false
-	file, err := os.Open(input)
-	if err != nil {
-		fmt.Println(err)
-	}
-	defer file.Close()
 
-	scanner := bufio.NewScanner(file)
+	scanner := bufio.NewScanner(strings.NewReader(input))
 
 	for scanner.Scan() {
 		line := strings.ToLower(scanner.Text())
@@ -137,7 +216,7 @@ func getMap(input string, token string) []rangeMap {
 
 		if tokenFound && line != "" {
 			tmpLine := line
-			//fmt.Println(tmpLine)
+
 			destinationRangeStart, err := strconv.Atoi(line[:strings.Index(tmpLine, " ")])
 
 			if err != nil {
@@ -163,9 +242,9 @@ func getMap(input string, token string) []rangeMap {
 
 			rangeMap := rangeMap{
 				destinationRangeStart,
-				destinationRangeStart + rangeLength,
+				destinationRangeStart + rangeLength - 1,
 				sourceRangeStart,
-				sourceRangeStart + rangeLength,
+				sourceRangeStart + rangeLength - 1,
 			}
 
 			retMap = append(retMap, rangeMap)
