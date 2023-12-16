@@ -27,8 +27,7 @@ func Part1Solve(input string) {
 	camelHands := getHands(stringInput)
 
 	classifiedHands := classifyHands(camelHands)
-	// 250220506 to low!
-	// 250343409 to high!
+
 	fmt.Printf("Total Winnings are: %d\n", calculateWinnings(classifiedHands, len(camelHands)))
 }
 
@@ -230,11 +229,6 @@ func insertInRankedOrder(hands []handOfCamel, hand handOfCamel) (ranked []handOf
 		return ranked
 
 	} else {
-		/*fmt.Print("Inserting hand: ")
-		fmt.Print(hand)
-		fmt.Print(" into: ")
-		fmt.Println(hands) */
-
 		for i, existingHand := range hands {
 			if isHigherRank(hand, existingHand) {
 				// insert hand before existing hand
