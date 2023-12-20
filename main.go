@@ -1,10 +1,7 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"os"
-	"strings"
 
 	"github.com/andrewsjg/AOC2023/puzzle1"
 	"github.com/andrewsjg/AOC2023/puzzle2"
@@ -12,6 +9,7 @@ import (
 	"github.com/andrewsjg/AOC2023/puzzle4"
 	"github.com/andrewsjg/AOC2023/puzzle6"
 	"github.com/andrewsjg/AOC2023/puzzle7"
+	"github.com/andrewsjg/AOC2023/puzzle8"
 )
 
 func main() {
@@ -65,34 +63,11 @@ func main() {
 	puzzle7.Part1Solve("./puzzle7/input.txt")
 	puzzle7.Part2Solve("./puzzle7/input.txt")
 
-	//p7Validator()
-}
-
-func p7Validator() {
-
-	file, err := os.ReadFile("./puzzle7/input.txt")
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	p7Input := string(file)
-
-	file, err = os.ReadFile("./out.txt")
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	p7Output := string(file)
-
-	scanner := bufio.NewScanner(strings.NewReader(p7Input))
-
-	for scanner.Scan() {
-		line := scanner.Text()
-
-		if !strings.Contains(p7Output, line[:5]) {
-			fmt.Println(line)
-		}
-
-	}
+	fmt.Println()
+	fmt.Println("======================================================")
+	fmt.Println("                     Puzzle 8")
+	fmt.Println("======================================================")
+	puzzle8.Part1Solve("./puzzle8/input.txt")
+	puzzle8.Part2Solve("./puzzle8/input.txt")
 
 }
