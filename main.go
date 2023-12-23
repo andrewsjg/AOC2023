@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/andrewsjg/AOC2023/puzzle1"
+	"github.com/andrewsjg/AOC2023/puzzle10"
 	"github.com/andrewsjg/AOC2023/puzzle2"
 	"github.com/andrewsjg/AOC2023/puzzle3"
 	"github.com/andrewsjg/AOC2023/puzzle4"
@@ -76,6 +77,14 @@ func main() {
 	fmt.Println("                     Puzzle 9")
 	fmt.Println("======================================================")
 	puzzle9.Part1Solve("./puzzle9/input.txt")
-	puzzle9.Part2Solve("./puzzle9/input.txt")
 
+	fmt.Println("Puzzle 9 part 2 takes a beat to long")
+	// puzzle9.Part2Solve("./puzzle9/input.txt")
+
+	fmt.Println()
+	fmt.Println("======================================================")
+	fmt.Println("                     Puzzle 10")
+	fmt.Println("======================================================")
+	puzzle10.Part1Solve("./puzzle10/input.txt")
+	//puzzle10.Part2Solve("./puzzle10/input.txt")
 }
