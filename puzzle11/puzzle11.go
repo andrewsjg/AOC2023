@@ -20,7 +20,7 @@ type galacticMap map[int]map[int]*Location
 
 func Part1Solve(input string) {
 
-	galaxyMap := expandGalaxyMap(input)
+	galaxyMap := expandGalaxyMap(input, false)
 
 	_, galaxyLocations := readMap(galaxyMap)
 
@@ -28,6 +28,44 @@ func Part1Solve(input string) {
 	total := totalDistances(galaxyLocations, &runningTotal)
 
 	fmt.Printf("Total distances between all galaxies: %d\n", total)
+
+}
+
+func Part2Solve(input string) {
+	galaxyMap := expandGalaxyMap(input, true)
+	_, galaxyLocations := readMap(galaxyMap)
+
+	fmt.Println(galaxyMap)
+
+	// Test Path
+
+	start := 0
+	end := 6
+
+	startGal := galaxyLocations[start]
+	endGal := galaxyLocations[end]
+
+	fmt.Printf("TEST PATH Start Gal X: %d, Y: %d\n", startGal.x, startGal.y)
+	fmt.Printf("TEST PATH End Gal X: %d, Y: %d\n", endGal.x, endGal.y)
+	fmt.Println()
+
+	for galNo, gal := range galaxyLocations {
+		fmt.Printf("Galaxy: %d has X: %d, Y: %d\n", galNo, gal.x, gal.y)
+	}
+
+	foundPath, _, found := path(startGal, endGal)
+	if found {
+
+		fmt.Printf("TEST PATH - Distance between galaxy %d and galaxy %d: %d\n", start, end, len(foundPath)-1)
+		// 0 to 6 = 5000021 vs 15 for Part 1
+	}
+
+	/*
+		runningTotal := 0
+		total := totalDistances(galaxyLocations, &runningTotal)
+
+		fmt.Printf("Total distances between all galaxies in the massively expanded universe: %d\n", total)
+	*/
 
 }
 
@@ -69,12 +107,13 @@ func distanceCalc(start *Location, end *Location, wg *sync.WaitGroup, resultsCha
 	foundPath, _, found := path(start, end)
 
 	if found {
+
 		resultsChan <- len(foundPath) - 1
 	}
 
 }
 
-func expandGalaxyMap(input string) string {
+func expandGalaxyMap(input string, part2 bool) string {
 	expandedMap := ""
 
 	file, err := os.ReadFile(input)
@@ -134,16 +173,35 @@ func expandGalaxyMap(input string) string {
 
 	rowCount = 0
 
+	//colsMarked := false
+
 	for scanner.Scan() {
 		line := scanner.Text()
 
 		for _, col := range cols {
 
-			line = line[:col] + "." + line[col:]
-		}
+			if part2 {
 
+				line = line[:col] + "&" + line[col:]
+				/*
+					if !colsMarked {
+						line = line[:col] + "&" + line[col:]
+					} else {
+						line = line[:col] + "." + line[col:]
+					} */
+
+			} else {
+				line = line[:col] + "." + line[col:]
+			}
+		}
+		//colsMarked = true
 		if slices.Contains(rows, rowCount) {
-			line = line + "\n" + line
+			if part2 {
+				line = "%" + line[1:]
+
+			} else {
+				line = line + "\n" + line
+			}
 		}
 
 		rowCount++
@@ -159,30 +217,55 @@ func readMap(input string) (world galacticMap, galaxyLocations []*Location) {
 
 	mapReader := bufio.NewScanner(strings.NewReader(input))
 
+	xMultiplier := 0
+	yMultiplier := 0
+
 	y := 0
+
 	for mapReader.Scan() {
 		line := mapReader.Text()
 
 		mapLine := string(line)
 
 		for x, chr := range mapLine {
+
+			//fmt.Println(xMultiplier, yMultiplier)
 			switch chr {
 			case '.':
-				Map.setLocation(&Location{topoType: '.'}, x, y)
+				Map.setLocation(&Location{topoType: '.'}, x+(xMultiplier*1000000), y+(yMultiplier*1000000))
 
 			case '#':
-				//fmt.Printf("Found Galaxy at: %d,%d\n", x, y)
-				//Map.setLocation(&Location{topoType: '#'}, x, y)
-				Map.setLocation(&Location{topoType: '.'}, x, y)
-				galaxyLocation := Map.getLocation(x, y)
+				// a Galaxy has the same movement cost as normal space
+				Map.setLocation(&Location{topoType: '.'}, x+(xMultiplier*1000000), y+(yMultiplier*1000000))
+				galaxyLocation := Map.getLocation(x+(xMultiplier*1000000), y+(yMultiplier*1000000))
 				galaxyLocations = append(galaxyLocations, galaxyLocation)
 
+			case '&':
+				// the '&' character represents a million time increase
+				// in the expansion along the x axis.
+
+				for i := x + (xMultiplier * 1000000); i <= x+(xMultiplier*1000000)+1000000; i++ {
+					Map.setLocation(&Location{topoType: '.'}, i, y+(yMultiplier*1000000))
+				}
+
+				xMultiplier++
+
+			case '%':
+				// the '%' character represents a million time increase
+				// in the expansion along the y axis.
+
+				for i := y + (yMultiplier * 1000000); i <= y+(yMultiplier*1000000)+1000000; i++ {
+					Map.setLocation(&Location{topoType: '.'}, x+(xMultiplier*1000000), i)
+				}
+
+				yMultiplier++
+
 			default:
-				Map.setLocation(&Location{topoType: int(chr)}, x, y)
+				Map.setLocation(&Location{topoType: int(chr)}, x+(xMultiplier*1000000), y+(yMultiplier*1000000))
 
 			}
 		}
-
+		xMultiplier = 0
 		y++
 	}
 
