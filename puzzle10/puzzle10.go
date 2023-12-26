@@ -63,37 +63,6 @@ func Part2Solve(input string) {
 		y++
 	}
 
-	/*
-		testCoordinates := coordinate{5, 5}
-		fmt.Print("{5,5} - should be false: ")
-		fmt.Println(insideLoop(loopMap, testCoordinates))
-
-		testCoordinates = coordinate{2, 6}
-		fmt.Print("{2,6} - should be true: ")
-		fmt.Println(insideLoop(loopMap, testCoordinates))
-
-		testCoordinates = coordinate{3, 6}
-		fmt.Print("{3,6} - should be true: ")
-		fmt.Println(insideLoop(loopMap, testCoordinates))
-
-		testCoordinates = coordinate{5, 7}
-		fmt.Print("{5,7} - should be false: ")
-		fmt.Println(insideLoop(loopMap, testCoordinates))
-
-		testCoordinates = coordinate{3, 4}
-		fmt.Print("{3,4} - should be false: ")
-		fmt.Println(insideLoop(loopMap, testCoordinates))
-
-		testCoordinates = coordinate{5, 4}
-		fmt.Print("{5,4} - should be false: ")
-		fmt.Println(insideLoop(loopMap, testCoordinates))
-	*/
-
-	// 1228 - to high
-	// 1226 - WRONG
-	// 34 - Wrong
-	// 572 - Wrong
-
 	fmt.Printf("Total locations inside the loop: %d\n", insideCount)
 
 }
