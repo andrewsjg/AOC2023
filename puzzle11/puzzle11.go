@@ -3,6 +3,7 @@ package puzzle11
 import (
 	"bufio"
 	"fmt"
+	"math"
 	"os"
 	"slices"
 	"strings"
@@ -53,23 +54,38 @@ func Part2Solve(input string) {
 		fmt.Printf("Galaxy: %d has X: %d, Y: %d\n", galNo, gal.x, gal.y)
 	}
 
-	foundPath, _, found := path(startGal, endGal)
-	if found {
+	distance := math.Abs(float64(endGal.x)-float64(startGal.x)) + math.Abs((float64(endGal.y) - float64(startGal.y)))
+	fmt.Printf("TEST PATH - Distance between galaxy %d and galaxy %d: %f\n", start, end, distance)
 
-		fmt.Printf("TEST PATH - Distance between galaxy %d and galaxy %d: %d\n", start, end, len(foundPath)-1)
-		// 0 to 6 = 5000021 vs 15 for Part 1
-	}
+	runningTotal := 0
+	total := totalDistances(galaxyLocations, &runningTotal)
 
-	/*
-		runningTotal := 0
-		total := totalDistances(galaxyLocations, &runningTotal)
-
-		fmt.Printf("Total distances between all galaxies in the massively expanded universe: %d\n", total)
-	*/
-
+	fmt.Printf("Total distances between all galaxies in the massively expanded universe: %d\n", total)
+	// 678627324165 - TO HIGH
 }
 
 func totalDistances(galaxyLocations []*Location, runningTotal *int) (distanceTotal int) {
+	if len(galaxyLocations) > 1 {
+
+		dist := 0.0
+
+		startGal := galaxyLocations[0]
+
+		for i := 1; i < len(galaxyLocations); i++ {
+
+			endGal := galaxyLocations[i]
+
+			dist = dist + math.Abs(float64(endGal.x)-float64(startGal.x)) + math.Abs((float64(endGal.y) - float64(startGal.y)))
+
+		}
+
+		*runningTotal = int(dist) + totalDistances(galaxyLocations[1:], runningTotal)
+	}
+
+	return *runningTotal
+}
+
+func totalDistancesAStar(galaxyLocations []*Location, runningTotal *int) (distanceTotal int) {
 	// Using go routines naively speeds this up, but not enough.
 	// There will be way better way to speed this up, but its not slow enough to worry about for part 1
 
@@ -173,8 +189,6 @@ func expandGalaxyMap(input string, part2 bool) string {
 
 	rowCount = 0
 
-	//colsMarked := false
-
 	for scanner.Scan() {
 		line := scanner.Text()
 
@@ -183,18 +197,12 @@ func expandGalaxyMap(input string, part2 bool) string {
 			if part2 {
 
 				line = line[:col] + "&" + line[col:]
-				/*
-					if !colsMarked {
-						line = line[:col] + "&" + line[col:]
-					} else {
-						line = line[:col] + "." + line[col:]
-					} */
 
 			} else {
 				line = line[:col] + "." + line[col:]
 			}
 		}
-		//colsMarked = true
+
 		if slices.Contains(rows, rowCount) {
 			if part2 {
 				line = "%" + line[1:]
@@ -237,6 +245,9 @@ func readMap(input string) (world galacticMap, galaxyLocations []*Location) {
 			case '#':
 				// a Galaxy has the same movement cost as normal space
 				Map.setLocation(&Location{topoType: '.'}, x+(xMultiplier*1000000), y+(yMultiplier*1000000))
+
+				// for part2 we only really care about the x,y values for the galaxies
+				// if we arent using pathfinding then we dont care about the neighbour x,y values
 				galaxyLocation := Map.getLocation(x+(xMultiplier*1000000), y+(yMultiplier*1000000))
 				galaxyLocations = append(galaxyLocations, galaxyLocation)
 
@@ -244,19 +255,14 @@ func readMap(input string) (world galacticMap, galaxyLocations []*Location) {
 				// the '&' character represents a million time increase
 				// in the expansion along the x axis.
 
-				for i := x + (xMultiplier * 1000000); i <= x+(xMultiplier*1000000)+1000000; i++ {
-					Map.setLocation(&Location{topoType: '.'}, i, y+(yMultiplier*1000000))
-				}
-
+				Map.setLocation(&Location{topoType: '.'}, x+(xMultiplier*1000000), y+(yMultiplier*1000000))
 				xMultiplier++
 
 			case '%':
 				// the '%' character represents a million time increase
 				// in the expansion along the y axis.
 
-				for i := y + (yMultiplier * 1000000); i <= y+(yMultiplier*1000000)+1000000; i++ {
-					Map.setLocation(&Location{topoType: '.'}, x+(xMultiplier*1000000), i)
-				}
+				Map.setLocation(&Location{topoType: '.'}, x+(xMultiplier*1000000), y+(yMultiplier*1000000))
 
 				yMultiplier++
 
