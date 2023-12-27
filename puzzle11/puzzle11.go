@@ -243,6 +243,7 @@ func readMap(input string) (world galacticMap, galaxyLocations []*Location) {
 
 			// ..&.#.&...&.
 			// 0,1,1-100,102,103(gal),104,106+100,207, ...
+			// 0 1  2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 78 79 80 81 82 83 84 85 8 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103   104  105(GAL)
 			switch chr {
 			case '.':
 				Map.setLocation(&Location{topoType: '.'}, x+(xMultiplier*100), y+(yMultiplier*100))
@@ -250,38 +251,10 @@ func readMap(input string) (world galacticMap, galaxyLocations []*Location) {
 			case '#':
 				// a Galaxy has the same movement cost as normal space
 
-				galaxyLocation := &Location{}
-
 				// this is a mess! Undo all of this and work it out properly!
-				if xMultiplier == 0 && yMultiplier == 0 {
-					Map.setLocation(&Location{topoType: '.'}, x, y)
-					galaxyLocation = Map.getLocation(x, y)
 
-				} else if xMultiplier != 0 && yMultiplier != 0 {
-					Map.setLocation(&Location{topoType: '.'}, x-1+(xMultiplier*100+x), y-1+(yMultiplier*100))
-					galaxyLocation = Map.getLocation(x-1+(xMultiplier*100+x), y-1+(yMultiplier*100))
-				} else if yMultiplier != 0 && xMultiplier == 0 {
-					Map.setLocation(&Location{topoType: '.'}, x, y-1+(yMultiplier*100))
-					galaxyLocation = Map.getLocation(x, y-1+(yMultiplier*100))
-				} else if xMultiplier != 0 && yMultiplier == 0 {
-					Map.setLocation(&Location{topoType: '.'}, x, y-1+(yMultiplier*100))
-					galaxyLocation = Map.getLocation(x-1+(xMultiplier*100), y)
-				}
-				/*
-					if xMultiplier == 0 && yMultiplier == 0 {
-						Map.setLocation(&Location{topoType: '.'}, x, y)
-						galaxyLocation = Map.getLocation(x, y)
-
-					} else if xMultiplier != 0 && yMultiplier != 0 {
-						Map.setLocation(&Location{topoType: '.'}, x+(xMultiplier*100), y+(yMultiplier*100))
-						galaxyLocation = Map.getLocation(x+(xMultiplier*100), y+(yMultiplier*100))
-					} else if yMultiplier != 0 && xMultiplier == 0 {
-						Map.setLocation(&Location{topoType: '.'}, x, y+(yMultiplier*100))
-						galaxyLocation = Map.getLocation(x, y+(yMultiplier*100))
-					} else if xMultiplier != 0 && yMultiplier == 0 {
-						Map.setLocation(&Location{topoType: '.'}, x+(xMultiplier*100), y)
-						galaxyLocation = Map.getLocation(x+(xMultiplier*100), y)
-					} */
+				Map.setLocation(&Location{topoType: '.'}, x+(xMultiplier*100), y+(yMultiplier*100))
+				galaxyLocation := Map.getLocation(x+(xMultiplier*100), y+(yMultiplier*100))
 
 				// for part2 we only really care about the x,y values for the galaxies
 				// if we arent using pathfinding then we dont care about the neighbour x,y values
