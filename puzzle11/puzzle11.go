@@ -252,6 +252,7 @@ func readMap(input string) (world galacticMap, galaxyLocations []*Location) {
 
 				galaxyLocation := &Location{}
 
+				// this is a mess! Undo all of this and work it out properly!
 				if xMultiplier == 0 && yMultiplier == 0 {
 					Map.setLocation(&Location{topoType: '.'}, x, y)
 					galaxyLocation = Map.getLocation(x, y)
