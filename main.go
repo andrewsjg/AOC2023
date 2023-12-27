@@ -94,6 +94,6 @@ func main() {
 	fmt.Println("                     Puzzle 11")
 	fmt.Println("======================================================")
 	//puzzle11.Part1Solve("./puzzle11/input.txt")
-	puzzle11.Part2Solve("./puzzle11/input.txt")
+	puzzle11.Part2Solve("./puzzle11/sampleinput.txt")
 
 }

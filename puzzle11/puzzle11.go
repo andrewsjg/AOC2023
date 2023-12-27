@@ -40,28 +40,30 @@ func Part2Solve(input string) {
 
 	// Test Path
 
-	start := 0
-	end := 6
+	start := 7
+	end := 8
 
 	startGal := galaxyLocations[start]
 	endGal := galaxyLocations[end]
 
-	fmt.Printf("TEST PATH Start Gal X: %d, Y: %d\n", startGal.x, startGal.y)
-	fmt.Printf("TEST PATH End Gal X: %d, Y: %d\n", endGal.x, endGal.y)
-	fmt.Println()
+	fmt.Printf("TEST PATH - Start Gal X: %d, Y: %d\n", startGal.x, startGal.y)
+	fmt.Printf("TEST PATH - End Gal X: %d, Y: %d\n", endGal.x, endGal.y)
 
+	distance := math.Abs(float64(endGal.x)-float64(startGal.x)) + math.Abs((float64(endGal.y) - float64(startGal.y)))
+	fmt.Printf("TEST PATH - Distance between galaxy %d and galaxy %d: %d\n", start, end, int(distance))
+
+	fmt.Println()
 	for galNo, gal := range galaxyLocations {
 		fmt.Printf("Galaxy: %d has X: %d, Y: %d\n", galNo, gal.x, gal.y)
 	}
 
-	distance := math.Abs(float64(endGal.x)-float64(startGal.x)) + math.Abs((float64(endGal.y) - float64(startGal.y)))
-	fmt.Printf("TEST PATH - Distance between galaxy %d and galaxy %d: %f\n", start, end, distance)
-
 	runningTotal := 0
 	total := totalDistances(galaxyLocations, &runningTotal)
 
+	// Using sample input and 100 times expansion this result should be 8410 but I get 8538
 	fmt.Printf("Total distances between all galaxies in the massively expanded universe: %d\n", total)
 	// 678627324165 - TO HIGH
+
 }
 
 func totalDistances(galaxyLocations []*Location, runningTotal *int) (distanceTotal int) {
@@ -236,38 +238,71 @@ func readMap(input string) (world galacticMap, galaxyLocations []*Location) {
 		mapLine := string(line)
 
 		for x, chr := range mapLine {
-
+			// 1000000
 			//fmt.Println(xMultiplier, yMultiplier)
+
+			// ..&.#.&...&.
+			// 0,1,1-100,102,103(gal),104,106+100,207, ...
 			switch chr {
 			case '.':
-				Map.setLocation(&Location{topoType: '.'}, x+(xMultiplier*1000000), y+(yMultiplier*1000000))
+				Map.setLocation(&Location{topoType: '.'}, x+(xMultiplier*100), y+(yMultiplier*100))
 
 			case '#':
 				// a Galaxy has the same movement cost as normal space
-				Map.setLocation(&Location{topoType: '.'}, x+(xMultiplier*1000000), y+(yMultiplier*1000000))
+
+				galaxyLocation := &Location{}
+
+				if xMultiplier == 0 && yMultiplier == 0 {
+					Map.setLocation(&Location{topoType: '.'}, x, y)
+					galaxyLocation = Map.getLocation(x, y)
+
+				} else if xMultiplier != 0 && yMultiplier != 0 {
+					Map.setLocation(&Location{topoType: '.'}, x-1+(xMultiplier*100+x), y-1+(yMultiplier*100))
+					galaxyLocation = Map.getLocation(x-1+(xMultiplier*100+x), y-1+(yMultiplier*100))
+				} else if yMultiplier != 0 && xMultiplier == 0 {
+					Map.setLocation(&Location{topoType: '.'}, x, y-1+(yMultiplier*100))
+					galaxyLocation = Map.getLocation(x, y-1+(yMultiplier*100))
+				} else if xMultiplier != 0 && yMultiplier == 0 {
+					Map.setLocation(&Location{topoType: '.'}, x, y-1+(yMultiplier*100))
+					galaxyLocation = Map.getLocation(x-1+(xMultiplier*100), y)
+				}
+				/*
+					if xMultiplier == 0 && yMultiplier == 0 {
+						Map.setLocation(&Location{topoType: '.'}, x, y)
+						galaxyLocation = Map.getLocation(x, y)
+
+					} else if xMultiplier != 0 && yMultiplier != 0 {
+						Map.setLocation(&Location{topoType: '.'}, x+(xMultiplier*100), y+(yMultiplier*100))
+						galaxyLocation = Map.getLocation(x+(xMultiplier*100), y+(yMultiplier*100))
+					} else if yMultiplier != 0 && xMultiplier == 0 {
+						Map.setLocation(&Location{topoType: '.'}, x, y+(yMultiplier*100))
+						galaxyLocation = Map.getLocation(x, y+(yMultiplier*100))
+					} else if xMultiplier != 0 && yMultiplier == 0 {
+						Map.setLocation(&Location{topoType: '.'}, x+(xMultiplier*100), y)
+						galaxyLocation = Map.getLocation(x+(xMultiplier*100), y)
+					} */
 
 				// for part2 we only really care about the x,y values for the galaxies
 				// if we arent using pathfinding then we dont care about the neighbour x,y values
-				galaxyLocation := Map.getLocation(x+(xMultiplier*1000000), y+(yMultiplier*1000000))
+				//galaxyLocation := Map.getLocation(x+(xMultiplier*100), y+(yMultiplier*100))
 				galaxyLocations = append(galaxyLocations, galaxyLocation)
 
 			case '&':
 				// the '&' character represents a million time increase
 				// in the expansion along the x axis.
 
-				Map.setLocation(&Location{topoType: '.'}, x+(xMultiplier*1000000), y+(yMultiplier*1000000))
 				xMultiplier++
+				//Map.setLocation(&Location{topoType: '.'}, x+(xMultiplier*100), y+(yMultiplier*100))
 
 			case '%':
 				// the '%' character represents a million time increase
 				// in the expansion along the y axis.
 
-				Map.setLocation(&Location{topoType: '.'}, x+(xMultiplier*1000000), y+(yMultiplier*1000000))
-
 				yMultiplier++
+				//Map.setLocation(&Location{topoType: '.'}, x+(xMultiplier*100), y+(yMultiplier*100))
 
 			default:
-				Map.setLocation(&Location{topoType: int(chr)}, x+(xMultiplier*1000000), y+(yMultiplier*1000000))
+				Map.setLocation(&Location{topoType: int(chr)}, x+(xMultiplier*100), y+(yMultiplier*100))
 
 			}
 		}
