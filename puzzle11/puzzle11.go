@@ -19,11 +19,14 @@ type Location struct {
 
 type galacticMap map[int]map[int]*Location
 
+// None of the A* stuff below is used beyond building the map. I used it to test pathfinding but it works fine for manhattan distance as well,
+// so I left it as is. But it makes the solutions slightly harder to follow.
+
 func Part1Solve(input string) {
 
-	galaxyMap := expandGalaxyMap(input, false)
+	galaxyMap := expandGalaxyMap(input)
 
-	_, galaxyLocations := readMap(galaxyMap)
+	_, galaxyLocations := readMap(galaxyMap, 1)
 
 	runningTotal := 0
 	total := totalDistances(galaxyLocations, &runningTotal)
@@ -33,36 +36,18 @@ func Part1Solve(input string) {
 }
 
 func Part2Solve(input string) {
-	galaxyMap := expandGalaxyMap(input, true)
-	_, galaxyLocations := readMap(galaxyMap)
+	galaxyMap := expandGalaxyMap(input)
+	_, galaxyLocations := readMap(galaxyMap, 999999)
 
-	fmt.Println(galaxyMap)
-
-	// Test Path
-
-	start := 7
-	end := 8
-
-	startGal := galaxyLocations[start]
-	endGal := galaxyLocations[end]
-
-	fmt.Printf("TEST PATH - Start Gal X: %d, Y: %d\n", startGal.x, startGal.y)
-	fmt.Printf("TEST PATH - End Gal X: %d, Y: %d\n", endGal.x, endGal.y)
-
-	distance := math.Abs(float64(endGal.x)-float64(startGal.x)) + math.Abs((float64(endGal.y) - float64(startGal.y)))
-	fmt.Printf("TEST PATH - Distance between galaxy %d and galaxy %d: %d\n", start, end, int(distance))
-
-	fmt.Println()
-	for galNo, gal := range galaxyLocations {
-		fmt.Printf("Galaxy: %d has X: %d, Y: %d\n", galNo, gal.x, gal.y)
-	}
+	/*
+		for galNo, gal := range galaxyLocations {
+			fmt.Printf("Galaxy: %d has X: %d, Y: %d\n", galNo, gal.x, gal.y)
+		} */
 
 	runningTotal := 0
 	total := totalDistances(galaxyLocations, &runningTotal)
 
-	// Using sample input and 100 times expansion this result should be 8410 but I get 8538
 	fmt.Printf("Total distances between all galaxies in the massively expanded universe: %d\n", total)
-	// 678627324165 - TO HIGH
 
 }
 
@@ -131,7 +116,7 @@ func distanceCalc(start *Location, end *Location, wg *sync.WaitGroup, resultsCha
 
 }
 
-func expandGalaxyMap(input string, part2 bool) string {
+func expandGalaxyMap(input string) string {
 	expandedMap := ""
 
 	file, err := os.ReadFile(input)
@@ -184,11 +169,6 @@ func expandGalaxyMap(input string, part2 bool) string {
 
 	scanner = bufio.NewScanner(strings.NewReader(stringInput))
 
-	for idx := range cols {
-
-		cols[idx] = cols[idx] + idx
-	}
-
 	rowCount = 0
 
 	for scanner.Scan() {
@@ -196,22 +176,24 @@ func expandGalaxyMap(input string, part2 bool) string {
 
 		for _, col := range cols {
 
-			if part2 {
+			newLine := ""
 
-				line = line[:col] + "&" + line[col:]
+			for idx, chr := range line {
 
-			} else {
-				line = line[:col] + "." + line[col:]
+				if idx != col {
+					newLine = newLine + string(chr)
+				} else {
+					newLine = newLine + "&"
+				}
 			}
+			line = newLine
+
 		}
 
 		if slices.Contains(rows, rowCount) {
-			if part2 {
-				line = "%" + line[1:]
 
-			} else {
-				line = line + "\n" + line
-			}
+			line = "%" + line[1:]
+
 		}
 
 		rowCount++
@@ -221,7 +203,7 @@ func expandGalaxyMap(input string, part2 bool) string {
 	return expandedMap
 }
 
-func readMap(input string) (world galacticMap, galaxyLocations []*Location) {
+func readMap(input string, expansionFactor int) (world galacticMap, galaxyLocations []*Location) {
 
 	Map := galacticMap{}
 
@@ -238,42 +220,33 @@ func readMap(input string) (world galacticMap, galaxyLocations []*Location) {
 		mapLine := string(line)
 
 		for x, chr := range mapLine {
-			// 1000000
-			//fmt.Println(xMultiplier, yMultiplier)
 
-			// ..&.#.&...&.
-			// 0,1,1-100,102,103(gal),104,106+100,207, ...
-			// 0 1  2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 78 79 80 81 82 83 84 85 8 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103   104  105(GAL)
 			switch chr {
 			case '.':
-				Map.setLocation(&Location{topoType: '.'}, x+(xMultiplier*100), y+(yMultiplier*100))
+				Map.setLocation(&Location{topoType: '.'}, x+(xMultiplier*expansionFactor), y+(yMultiplier*expansionFactor))
 
 			case '#':
 				// a Galaxy has the same movement cost as normal space
 
-				// this is a mess! Undo all of this and work it out properly!
-
-				Map.setLocation(&Location{topoType: '.'}, x+(xMultiplier*100), y+(yMultiplier*100))
-				galaxyLocation := Map.getLocation(x+(xMultiplier*100), y+(yMultiplier*100))
+				Map.setLocation(&Location{topoType: '.'}, x+(xMultiplier*expansionFactor), y+(yMultiplier*expansionFactor))
+				galaxyLocation := Map.getLocation(x+(xMultiplier*expansionFactor), y+(yMultiplier*expansionFactor))
 
 				// for part2 we only really care about the x,y values for the galaxies
 				// if we arent using pathfinding then we dont care about the neighbour x,y values
-				//galaxyLocation := Map.getLocation(x+(xMultiplier*100), y+(yMultiplier*100))
+
 				galaxyLocations = append(galaxyLocations, galaxyLocation)
 
 			case '&':
-				// the '&' character represents a million time increase
+				// the '&' character represents an expansion factor increase
 				// in the expansion along the x axis.
 
 				xMultiplier++
-				//Map.setLocation(&Location{topoType: '.'}, x+(xMultiplier*100), y+(yMultiplier*100))
 
 			case '%':
-				// the '%' character represents a million time increase
+				// the '%' character represents an expansion factor increase
 				// in the expansion along the y axis.
 
 				yMultiplier++
-				//Map.setLocation(&Location{topoType: '.'}, x+(xMultiplier*100), y+(yMultiplier*100))
 
 			default:
 				Map.setLocation(&Location{topoType: int(chr)}, x+(xMultiplier*100), y+(yMultiplier*100))
@@ -354,29 +327,6 @@ func (l Location) neighbours() []Pather {
 	}
 	return neighbours
 }
-
-/*
-func (l Location) neighbours() []Pather {
-	neighbours := []Pather{}
-	for _, offset := range [][]int{
-		{-1, 0},
-		{1, 0},
-		{0, -1},
-		{0, 1},
-	} {
-
-		if neighbour := l.Map.getLocation(l.x+offset[0], l.y+offset[1]); neighbour != nil {
-
-			diff := neighbour.topoType - l.topoType
-
-			// Exclude neighbours that are to high
-			if diff < 2 {
-				neighbours = append(neighbours, neighbour)
-			}
-		}
-	}
-	return neighbours
-} */
 
 func (t galacticMap) getLocation(x, y int) *Location {
 	if t[x] == nil {
